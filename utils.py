@@ -33,10 +33,9 @@ def get_one(query: str):
 #Напишем функцию, которая получает в качестве аргумента имена двух актеров,
 # сохраняет всех актеров из колонки cast и возвращает список тех,
 # кто играет с ними в паре больше 2 раз.
-
 def search_by_cast(name1: str = 'Rose McIver', name2: str = 'Ben Lamb'):
     query = f"""
-    SELECT * FROM netflix
+    SELECT "cast" FROM netflix
     WHERE "cast" like '%{name1}%' and "cast" like '%{name2}%'
     """
 
@@ -45,8 +44,10 @@ def search_by_cast(name1: str = 'Rose McIver', name2: str = 'Ben Lamb'):
     actors = []
 #создаем общий список актеров
     for item in result:
+        #print(item)
         #делаем список актеров
-        item = ''.join(item)
+        item = item['cast']
+        #print(item)
         #разделяем актеров
         item = item.split(', ')
         #добавим каждого актера в список
@@ -54,17 +55,40 @@ def search_by_cast(name1: str = 'Rose McIver', name2: str = 'Ben Lamb'):
             all_actors.append(item_list)
     #список кто сыграл более 2 раз
     for actor in all_actors:
-        count = 0
+        count = {}
         for item in all_actors:
-            if item == actor:
-                count += 1
-        if count > 2:
+            count[item] = count.setdefault(item, 0) + 1
             actors.append(actor)
 
     #избавимся от повторений
     actors = set(actors)
 
     return actors
+    #print(actors)
+
+#альтернативное решение 5 задания
+# def search_by_cast(name1: str, name2: str) -> list[str]:
+#     query = f"""
+#     SELECT "cast" FROM netflix
+#     WHERE "cast" like '%{name1}%' and "cast" like '%{name2}%'
+#     """
+#     count = {}
+#
+#     query_result = get_all(query)
+#
+#     for row in query_result:
+#         list_actors = row["cast"].split(", ")
+#         for actor in list_actors:
+#             if actor not in (name1, name2):
+#                 value = count.get(actor, 0)
+#                 count[actor] = value + 1
+#     result = []
+#
+#     for actor_name, actor_count in count.items():
+#         if actor_count > 2:
+#             result.append(actor_name)
+#
+#     return result
 
 #Напишем функцию, с помощью которой можно будет передавать тип картины
 #и получать на выходе список названий картин с их описаниями в JSON.
@@ -90,15 +114,6 @@ def get_movie_by_type(type: str, release_year, genre: str):
     return jsonify(result)
 
 
+#search_by_cast()
 
-
-
-# def search_name():
-#     """Реализация поиска по названию."""
-#     with sqlite3.connect("netflix.db") as connection:
-#         cursor = connection.cursor()
-#         sqlite_query = "SELECT * FROM netflix"
-#         result = cursor.execute(sqlite_query)
-#         for row in result:
-#             print(row)
 
